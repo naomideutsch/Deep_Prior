@@ -16,6 +16,7 @@ def get_kernel(kernel_size, sigma):
 
 def apply_blur(img, kernel):
     blur = kernel()
+    print(blur)
     img = tf.nn.depthwise_conv2d(img[None], blur, [1,1,1,1], 'SAME')
     return img[0]
 
