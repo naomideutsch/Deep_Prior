@@ -7,6 +7,10 @@ from tqdm import tqdm
 import numpy as np
 import tensorflow as tf
 
+import os
+import sys
+file_dir = os.path.dirname("stylegan/")
+sys.path.append(file_dir)
 
 
 import dnnlib
