@@ -7,8 +7,7 @@ import tensorflow as tf
 
 
 def blur_preprocessing(args):
-    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma)
-    print(kernel)
+    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma, type=args.kerenl_type)
     images_paths = os.listdir(args.img_dir)
     for name in images_paths:
         image = Image.open(os.path.join(args.img_dir, name))
@@ -23,6 +22,7 @@ if __name__ == '__main__':
     parser.add_argument('--img-dir', type=str, required=True)
     parser.add_argument('--output-dir', type=str, required=True)
     parser.add_argument('--kernel-size', type=int, default=3)
+    parser.add_argument('--kernel-type', default="gauss")
     parser.add_argument('--sigma', type=int, default=2)
     args = parser.parse_args()
     if not os.path.exists(args.output_dir):
