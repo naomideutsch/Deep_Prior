@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--input-size', type=int, nargs=2, default=(128, 128))
     parser.add_argument('--beta', type=float, default=0.01)
-    parser.add_argument('--reg', type=float, default="l2")
+    parser.add_argument('--reg', default="l2")
 
 
     parser.add_argument('--kernel-size', type=int, default=3)
