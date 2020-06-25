@@ -110,7 +110,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    os.makedirs(args.hr_imgs_dir, exist_ok=True)
+    os.makedirs(args.deblurred_imgs_dir, exist_ok=True)
     os.makedirs(args.latents_dir, exist_ok=True)
 
     optimize_latent_codes(args)
