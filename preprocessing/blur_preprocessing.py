@@ -24,6 +24,6 @@ if __name__ == '__main__':
     parser.add_argument('--kernel-size', type=int, default=3)
     parser.add_argument('--sigma', type=int, default=2)
     args = parser.parse_args()
-    if not os.path.exists(args.lr_imgs_dir):
-        os.makedirs(args.lr_imgs_dir)
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
     blur_preprocessing(args)
