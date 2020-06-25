@@ -58,9 +58,8 @@ def optimize_latent_codes(args):
 
     reg = tf.nn.l2_loss(generated_blurred_img)
 
-    beta = 0.01
 
-    loss_op += beta * reg
+    loss_op += args.beta * reg
 
     optimizer = tf.train.AdamOptimizer(learning_rate=args.learning_rate)
     train_op = optimizer.minimize(loss_op, var_list=[latent_code])
@@ -111,6 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--latents-dir', type=str, required=True)
 
     parser.add_argument('--input-size', type=int, nargs=2, default=(128, 128))
+    parser.add_argument('--beta', type=float, default=0.01)
 
     parser.add_argument('--kernel-size', type=int, default=3)
     parser.add_argument('--sigma', type=int, default=2)
