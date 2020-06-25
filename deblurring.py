@@ -32,6 +32,7 @@ def get_gradient_reg(image):
     return sx + sy
 
 def get_l2_reg(image):
+    print(tf.nn.l2_loss(image))
     return tf.reduce_mean(tf.nn.l2_loss(image))
 
 def get_reg_by_name(name):
