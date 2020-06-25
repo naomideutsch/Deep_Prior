@@ -25,6 +25,14 @@ from perceptual_model import PerceptualModel
 STYLEGAN_MODEL_URL = 'https://drive.google.com/uc?id=1MEGjdvVpUsu1jB4zrXZN7Y4kBBOzizDQ'
 
 
+def get_gradient_reg(img):
+
+    sx = np.sum(np.power(ndimage.sobel(image_crop, axis=0, mode='constant'), 2))
+    # Get y-gradient in "sy"
+    sy = np.sum(np.power(ndimage.sobel(image_crop, axis=1, mode='constant'), 2))
+    return sx + sy
+
+
 def optimize_latent_codes(args):
     tflib.init_tf()
 
@@ -56,7 +64,7 @@ def optimize_latent_codes(args):
 
     loss_op = tf.reduce_mean(tf.abs(generated_img_features - target_img_features))
 
-    reg = tf.nn.l2_loss(generated_blurred_img)
+    reg = tf.reduce_mean(tf.nn.l2_loss(generated_blurred_img))
 
 
     loss_op += args.beta * reg
