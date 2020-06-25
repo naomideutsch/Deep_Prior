@@ -13,12 +13,12 @@ def _gaussian_kernel(kernel_size, sigma, n_channels, dtype):
 
 def _x_motion_kernel(kernel_size):
     np_result = np.zeros(kernel_size).astype(np.float)
-    np_result[:, kernel_size[1]//2] = 1
+    np_result[:, kernel_size//2] = 1
     return tf.convert_to_tensor(np_result)
 
 def _y_motion_kernel(kernel_size):
     np_result = np.zeros(kernel_size).astype(np.float)
-    np_result[kernel_size[1]//2, :] = 1
+    np_result[kernel_size//2, :] = 1
     return tf.convert_to_tensor(np_result)
 
 
