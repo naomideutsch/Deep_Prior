@@ -15,12 +15,12 @@ def _x_motion_kernel(kernel_size):
     np_result = np.zeros((kernel_size, kernel_size,3,1)).astype(np.float32)
     np_result[:, kernel_size//2, :, :] = 1
     print(np_result[:,:,1,0])
-    return tf.convert_to_tensor(np_result)
+    return tf.convert_to_tensor(np_result * (1/kernel_size))
 
 def _y_motion_kernel(kernel_size):
     np_result = np.zeros((kernel_size, kernel_size,3,1)).astype(np.float32)
     np_result[kernel_size//2, :, :, :] = 1
-    return tf.convert_to_tensor(np_result)
+    return tf.convert_to_tensor(np_result* (1/kernel_size))
 
 
 
