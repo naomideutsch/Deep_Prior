@@ -14,6 +14,7 @@ def _gaussian_kernel(kernel_size, sigma, n_channels, dtype):
 def _x_motion_kernel(kernel_size):
     np_result = np.zeros((kernel_size, kernel_size,3,1)).astype(np.float32)
     np_result[:, kernel_size//2, :, :] = 1
+    print(np_result[:,:,1,0])
     return tf.convert_to_tensor(np_result)
 
 def _y_motion_kernel(kernel_size):
@@ -35,8 +36,11 @@ def get_kernel(kernel_size, sigma, type="gauss"):
 
 def apply_blur(img, kernel):
     blur = kernel()
-    img = tf.nn.depthwise_conv2d(img, blur, [1,1,1,1], 'SAME')
+    pointwise_filter = tf.eye(3, batch_shape=[1, 1])
+    img = tf.nn.separable_conv2d(img, blur, pointwise_filter, [1,1,1,1], 'SAME')
     return img
+
+
 
 
 
