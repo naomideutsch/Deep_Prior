@@ -2,7 +2,7 @@ import argparse
 import os
 from PIL import Image
 import numpy as np
-from preprocessing import blur_utils
+import blur_utils
 import tensorflow as tf
 
 
