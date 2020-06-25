@@ -50,6 +50,10 @@ def optimize_latent_codes(args):
     generated_img_features = perceptual_model(generated_blurred_img)
     target_img_features = perceptual_model(blr_img)
 
+    tf.print(generated_img_features)
+    tf.print(target_img_features)
+
+
     loss_op = tf.reduce_mean(tf.abs(generated_img_features - target_img_features))
 
     optimizer = tf.train.AdamOptimizer(learning_rate=args.learning_rate)
