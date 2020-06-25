@@ -7,7 +7,7 @@ import tensorflow as tf
 
 
 def blur_preprocessing(args):
-    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma, type=args.kerenl_type)
+    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma, type=args.kernel_type)
     images_paths = os.listdir(args.img_dir)
     for name in images_paths:
         image = Image.open(os.path.join(args.img_dir, name))
