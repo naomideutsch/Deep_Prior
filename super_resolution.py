@@ -7,9 +7,11 @@ from tqdm import tqdm
 import numpy as np
 import tensorflow as tf
 
-import dnnlib
-import dnnlib.tflib as tflib
-import config
+
+
+from stylegan import dnnlib
+import stylegan.dnnlib.tflib as tflib
+from stylegan import config
 
 from perceptual_model import PerceptualModel
 
