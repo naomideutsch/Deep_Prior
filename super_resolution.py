@@ -9,9 +9,9 @@ import tensorflow as tf
 
 
 
-from stylegan import dnnlib
-import stylegan.dnnlib.tflib as tflib
-from stylegan import config
+import dnnlib
+import dnnlib.tflib as tflib
+import config
 
 from perceptual_model import PerceptualModel
 
