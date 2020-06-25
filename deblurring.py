@@ -56,6 +56,12 @@ def optimize_latent_codes(args):
 
     loss_op = tf.reduce_mean(tf.abs(generated_img_features - target_img_features))
 
+    reg = tf.nn.l2_loss(generated_blurred_img)
+
+    beta = 0.01
+
+    loss_op += beta * reg
+
     optimizer = tf.train.AdamOptimizer(learning_rate=args.learning_rate)
     train_op = optimizer.minimize(loss_op, var_list=[latent_code])
 
