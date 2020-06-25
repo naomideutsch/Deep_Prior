@@ -25,16 +25,27 @@ from perceptual_model import PerceptualModel
 STYLEGAN_MODEL_URL = 'https://drive.google.com/uc?id=1MEGjdvVpUsu1jB4zrXZN7Y4kBBOzizDQ'
 
 
-def get_gradient_reg(img):
-
-    sx = np.sum(np.power(ndimage.sobel(image_crop, axis=0, mode='constant'), 2))
-    # Get y-gradient in "sy"
-    sy = np.sum(np.power(ndimage.sobel(image_crop, axis=1, mode='constant'), 2))
+def get_gradient_reg(image):
+    dx, dy = tf.image.image_gradients(image)
+    sx = tf.reduce_mean(tf.pow(dx,2))
+    sy = tf.reduce_mean(tf.pow(dy,2))
     return sx + sy
+
+def get_l2_reg(image):
+    return tf.reduce_mean(tf.nn.l2_loss(image))
+
+def get_reg_by_name(name):
+    if name == "grad":
+        return lambda image: get_gradient_reg(image)
+    if name == "l2":
+        return lambda image: get_l2_reg(image)
+
 
 
 def optimize_latent_codes(args):
     tflib.init_tf()
+
+    reg = get_reg_by_name(args.reg)
 
     kernel = blur_utils.get_kernel(args.kernel_size, args.sigma)
 
@@ -62,7 +73,8 @@ def optimize_latent_codes(args):
 
     loss_op = tf.reduce_mean(tf.abs(generated_img_features - target_img_features))
 
-    loss_op += tf.reduce_mean(args.beta * tf.nn.l2_loss(generated_blurred_img))
+    if reg != None:
+        loss_op += args.beta * reg(generated_blurred_img)
 
 
 
