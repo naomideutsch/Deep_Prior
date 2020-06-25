@@ -39,7 +39,6 @@ def apply_blur(img, kernel):
     return img
 
 
-print(_x_motion_kernel((5,5)))
 
 
 
