@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 import numpy as np
 import tensorflow as tf
-from preprocessing import blur_utils
+from preprocessing import utils
 
 import os
 import sys
@@ -48,7 +48,7 @@ def optimize_latent_codes(args):
 
     reg = get_reg_by_name(args.reg)
 
-    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma, type=args.kernel_type)
+    kernel = utils.get_kernel(args.kernel_size, args.sigma, type=args.kernel_type)
 
     with open(STYLEGAN_MODEL_URL, "rb") as f:
         _G, _D, Gs = pickle.load(f)
@@ -61,7 +61,7 @@ def optimize_latent_codes(args):
     generated_img = tf.transpose(generated_img, [0, 2, 3, 1])
     generated_img = ((generated_img + 1) / 2) * 255
     generated_img = tf.image.resize_images(generated_img, tuple(args.input_size), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-    generated_blurred_img = blur_utils.apply_blur(generated_img, kernel)
+    generated_blurred_img = utils.apply_blur(generated_img, kernel)
     generated_img_for_display = tf.saturate_cast(generated_img, tf.uint8)
 
     blr_img = tf.placeholder(tf.float32, [None, args.input_size[0], args.input_size[1], 3])
@@ -75,7 +75,7 @@ def optimize_latent_codes(args):
     loss_op = tf.reduce_mean(tf.abs(generated_img_features - target_img_features))
 
     if reg != None:
-        loss_op += args.beta * reg(generated_blurred_img)
+        loss_op += args.beta * reg(generated_img)
 
 
 
