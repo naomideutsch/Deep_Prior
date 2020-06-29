@@ -50,7 +50,7 @@ def optimize_latent_codes(args):
 
     kernel = blur_utils.get_kernel(args.kernel_size, args.sigma, type=args.kernel_type)
 
-    with open(STYLEGAN_MODEL_URL) as f:
+    with open(STYLEGAN_MODEL_URL, "rb") as f:
         _G, _D, Gs = pickle.load(f)
 
     latent_code = tf.get_variable(
