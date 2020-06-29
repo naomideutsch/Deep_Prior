@@ -2,6 +2,9 @@
 import tensorflow as tf
 import argparse
 import numpy as np
+from skimage.draw import circle
+import cv2
+
 
 def _gaussian_kernel(kernel_size, sigma, n_channels, dtype):
     x = tf.range(-kernel_size // 2 + 1, kernel_size // 2 + 1, dtype=dtype)
@@ -23,15 +26,49 @@ def _y_motion_kernel(kernel_size):
     return tf.convert_to_tensor(np_result* (1/kernel_size))
 
 
+def _disk_kernel(kernel_size):
+    kernelwidth = kernel_size
+    kernel = np.zeros((kernelwidth, kernelwidth), dtype=np.float32)
+    circleCenterCoord = kernel_size / 2
+    circleRadius = circleCenterCoord + 1
+
+    rr, cc = circle(circleCenterCoord, circleCenterCoord, circleRadius)
+    kernel[rr, cc] = 1
+
+    if (kernel_size == 3 or kernel_size == 5):
+        kernel = Adjust(kernel, kernel_size)
+
+    normalizationFactor = np.count_nonzero(kernel)
+    kernel = kernel / normalizationFactor
+    return kernel
 
 
-def get_kernel(kernel_size, sigma, type="gauss"):
+def Adjust(kernel, kernelwidth):
+    kernel[0, 0] = 0
+    kernel[0, kernelwidth - 1] = 0
+    kernel[kernelwidth - 1, 0] = 0
+    kernel[kernelwidth - 1, kernelwidth - 1] = 0
+    return kernel
+
+
+
+
+def get_blur(kernel_size, sigma, type="gauss"):
     if type == "gauss":
-        return lambda:  _gaussian_kernel(kernel_size, sigma, 3, tf.float32)
+        kernel = _gaussian_kernel(kernel_size, sigma, 3, tf.float32)
+        return lambda image:  apply_blur(image, kernel)
     if type == "x_motion":
-        return lambda: _x_motion_kernel(kernel_size)
+        kernel = _x_motion_kernel(kernel_size)
+        return lambda image: apply_blur(image, kernel)
     if type == "y_motion":
-        return lambda: _y_motion_kernel(kernel_size)
+        kernel = _y_motion_kernel(kernel_size)
+        return lambda image: apply_blur(image, kernel)
+
+    if type == "disk":
+        kernel = _disk_kernel(kernel_size)
+        return lambda image: apply_blur(image, kernel)
+    if type == "median":
+        return lambda image: cv2.medianBlur(image, kernel_size)
 
 
 def apply_blur(img, kernel):
