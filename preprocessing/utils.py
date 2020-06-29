@@ -41,6 +41,7 @@ def _disk_kernel(kernel_size):
 
     normalizationFactor = np.count_nonzero(kernel)
     kernel = kernel / normalizationFactor
+    print(kernel)
     return kernel
 
 
