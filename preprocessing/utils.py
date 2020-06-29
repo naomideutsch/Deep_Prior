@@ -27,13 +27,14 @@ def _y_motion_kernel(kernel_size):
 
 
 def _disk_kernel(kernel_size):
+
     kernelwidth = kernel_size
-    kernel = np.zeros((kernelwidth, kernelwidth), dtype=np.float32)
+    kernel = np.zeros((kernelwidth, kernelwidth, 3 ,1), dtype=np.float32)
     circleCenterCoord = kernel_size // 2
     circleRadius = circleCenterCoord + 1
 
     rr, cc = circle(circleCenterCoord, circleCenterCoord, circleRadius)
-    kernel[rr, cc] = 1
+    kernel[rr, cc, :, :] = 1
 
     if (kernel_size == 3 or kernel_size == 5):
         kernel = Adjust(kernel, kernel_size)
