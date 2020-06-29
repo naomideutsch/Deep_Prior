@@ -39,8 +39,8 @@ def _disk_kernel(kernel_size):
     if (kernel_size == 3 or kernel_size == 5):
         kernel = Adjust(kernel, kernel_size)
 
-    normalizationFactor = np.count_nonzero(kernel)
-    kernel = kernel / normalizationFactor
+    # normalizationFactor = np.count_nonzero(kernel)
+    # kernel = kernel / normalizationFactor
     print(kernel[:,:,0,0])
     return kernel
 
