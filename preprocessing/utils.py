@@ -29,7 +29,7 @@ def _y_motion_kernel(kernel_size):
 def _disk_kernel(kernel_size):
     kernelwidth = kernel_size
     kernel = np.zeros((kernelwidth, kernelwidth), dtype=np.float32)
-    circleCenterCoord = kernel_size / 2
+    circleCenterCoord = kernel_size // 2
     circleRadius = circleCenterCoord + 1
 
     rr, cc = circle(circleCenterCoord, circleCenterCoord, circleRadius)
