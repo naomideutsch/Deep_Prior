@@ -17,13 +17,13 @@ def _gaussian_kernel(kernel_size, sigma, n_channels, dtype):
 def _x_motion_kernel(kernel_size):
     np_result = np.zeros((kernel_size, kernel_size,3,1)).astype(np.float32)
     np_result[:, kernel_size//2, :, :] = 1
-    print(np_result[:,:,1,0])
     return tf.convert_to_tensor(np_result * (1/kernel_size))
 
 def _y_motion_kernel(kernel_size):
     np_result = np.zeros((kernel_size, kernel_size,3,1)).astype(np.float32)
     np_result[kernel_size//2, :, :, :] = 1
     return tf.convert_to_tensor(np_result* (1/kernel_size))
+
 
 
 def _disk_kernel(kernel_size):
@@ -55,7 +55,7 @@ def Adjust(kernel, kernelwidth):
 
 def get_blur(kernel_size, sigma, type="gauss"):
     if type == "gauss":
-        kernel = _gaussian_kernel(kernel_size, sigma, 3, tf.float32)
+        kernel = _gaussian_kernel(kernel_size, sigma, 3, tf.float32) #sigma = 2
         return lambda image:  apply_blur(image, kernel)
     if type == "x_motion":
         kernel = _x_motion_kernel(kernel_size)
@@ -69,6 +69,9 @@ def get_blur(kernel_size, sigma, type="gauss"):
         return lambda image: apply_blur(image, kernel)
     if type == "median":
         return lambda image: cv2.medianBlur(image, kernel_size)
+
+    if type == "bi":
+        return lambda image: cv2.bilateralFilter(image,kernel_size,sigma,sigma) # sigma = 75
 
 
 def apply_blur(img, kernel):
