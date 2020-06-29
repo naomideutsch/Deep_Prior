@@ -22,7 +22,7 @@ import config
 
 from perceptual_model import PerceptualModel
 
-STYLEGAN_MODEL_URL = 'https://drive.google.com/drive/folders/1af1lMR_798_UwQjkgxQ-T0JGusIRa6rJ'
+STYLEGAN_MODEL_URL = 'https://drive.google.com/file/d/1c_T7ftg7usUjLVrV4zkzhD9FpDs5U04D/view?usp=sharing'
 
 
 def get_gradient_reg(image):
