@@ -2,17 +2,17 @@ import argparse
 import os
 from PIL import Image
 import numpy as np
-import blur_utils
+import utils
 import tensorflow as tf
 
 
 def blur_preprocessing(args):
-    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma, type=args.kernel_type)
+    kernel = utils.get_kernel(args.kernel_size, args.sigma, type=args.kernel_type)
     images_paths = os.listdir(args.img_dir)
     for name in images_paths:
         image = Image.open(os.path.join(args.img_dir, name))
         tf_image = tf.convert_to_tensor(np.array(image).astype(np.float32))
-        blr_image = blur_utils.apply_blur(tf_image[None], kernel)[0]
+        blr_image = utils.apply_blur(tf_image[None], kernel)[0]
         blurred = Image.fromarray(np.uint8(tf.Session().run(blr_image)))
         blurred.save(os.path.join(args.output_dir, name))
 
