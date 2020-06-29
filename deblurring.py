@@ -48,7 +48,7 @@ def optimize_latent_codes(args):
 
     reg = get_reg_by_name(args.reg)
 
-    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma)
+    kernel = blur_utils.get_kernel(args.kernel_size, args.sigma, type=args.kernel_type)
 
     with dnnlib.util.open_url(STYLEGAN_MODEL_URL, cache_dir=config.cache_dir) as f:
         _G, _D, Gs = pickle.load(f)
@@ -133,7 +133,10 @@ if __name__ == '__main__':
     parser.add_argument('--reg', default="l2")
 
 
+
     parser.add_argument('--kernel-size', type=int, default=3)
+    parser.add_argument('--kernel-type', default="gauss")
+
     parser.add_argument('--sigma', type=int, default=2)
     parser.add_argument('--learning-rate', type=float, default=1e-3)
     parser.add_argument('--total-iterations', type=int, default=1000)
