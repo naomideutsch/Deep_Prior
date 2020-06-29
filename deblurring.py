@@ -22,7 +22,7 @@ import config
 
 from perceptual_model import PerceptualModel
 
-STYLEGAN_MODEL_URL = 'https://drive.google.com/open?id=1af1lMR_798_UwQjkgxQ-T0JGusIRa6rJ'
+STYLEGAN_MODEL_URL = '/content/drive/My Drive/Colab Notebooks/styleGAN_weights/karras2019stylegan-ffhq-1024x1024.pkl'
 
 
 def get_gradient_reg(image):
