@@ -72,9 +72,8 @@ def get_blur(kernel_size, sigma, type="gauss"):
 
 
 def apply_blur(img, kernel):
-    blur = kernel()
     pointwise_filter = tf.eye(3, batch_shape=[1, 1])
-    img = tf.nn.separable_conv2d(img, blur, pointwise_filter, [1,1,1,1], 'SAME')
+    img = tf.nn.separable_conv2d(img, kernel, pointwise_filter, [1,1,1,1], 'SAME')
     return img
 
 
