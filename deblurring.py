@@ -43,14 +43,14 @@ def get_reg_by_name(name):
 
 
 
-def optimize_latent_codes(args):
+
+def optimize_latent_codes(args, method):
     tflib.init_tf()
 
     reg = get_reg_by_name(args.reg)
 
-    blur_func = utils.get_blur(args.kernel_size, args.sigma, type=args.kernel_type)
 
-    with open(STYLEGAN_MODEL_URL, "rb") as f:
+    with open(args.ckpt, "rb") as f:
         _G, _D, Gs = pickle.load(f)
 
     latent_code = tf.get_variable(
@@ -61,14 +61,14 @@ def optimize_latent_codes(args):
     generated_img = tf.transpose(generated_img, [0, 2, 3, 1])
     generated_img = ((generated_img + 1) / 2) * 255
     generated_img = tf.image.resize_images(generated_img, tuple(args.input_size), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-    generated_blurred_img = blur_func(generated_img)
+    generated_method_img = method(generated_img)
     generated_img_for_display = tf.saturate_cast(generated_img, tf.uint8)
 
-    blr_img = tf.placeholder(tf.float32, [None, args.input_size[0], args.input_size[1], 3])
+    method_img = tf.placeholder(tf.float32, [None, args.input_size[0], args.input_size[1], 3])
 
     perceptual_model = PerceptualModel(img_size=args.input_size)
-    generated_img_features = perceptual_model(generated_blurred_img)
-    target_img_features = perceptual_model(blr_img)
+    generated_img_features = perceptual_model(generated_method_img)
+    target_img_features = perceptual_model(method_img)
 
 
 
@@ -101,7 +101,7 @@ def optimize_latent_codes(args):
             loss, _ = sess.run(
                 fetches=[loss_op, train_op],
                 feed_dict={
-                    blr_img: img[np.newaxis, ...]
+                    method_img: img[np.newaxis, ...]
                 }
             )
 
@@ -110,7 +110,7 @@ def optimize_latent_codes(args):
         deblurred_imgs, latent_codes = sess.run(
             fetches=[generated_img_for_display, latent_code],
             feed_dict={
-                blr_img: img[np.newaxis, ...]
+                method_img: img[np.newaxis, ...]
             }
         )
 
@@ -127,6 +127,8 @@ if __name__ == '__main__':
     parser.add_argument('--blurred-imgs-dir', type=str, required=True)
     parser.add_argument('--deblurred-imgs-dir', type=str, required=True)
     parser.add_argument('--latents-dir', type=str, required=True)
+    parser.add_argument('--m', type=str, default="blur")
+    parser.add_argument('--ckpt', type=str)
 
     parser.add_argument('--input-size', type=int, nargs=2, default=(128, 128))
     parser.add_argument('--beta', type=float, default=0.01)
@@ -147,4 +149,11 @@ if __name__ == '__main__':
     os.makedirs(args.deblurred_imgs_dir, exist_ok=True)
     os.makedirs(args.latents_dir, exist_ok=True)
 
-    optimize_latent_codes(args)
+    method = None
+    if args.m == "blur":
+        method = utils.get_blur(args.kernel_size, args.sigma, type=args.kernel_type)
+    else: # args.m == "color"
+        method = lambda image: utils.convert_to_gray(image)
+
+
+    optimize_latent_codes(args, method)
