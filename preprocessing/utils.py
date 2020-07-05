@@ -116,10 +116,10 @@ def apply_bilateral_filter(source, filtered_image, x, y, diameter, sigma_i, sigm
         while j < diameter:
             neighbour_x = x - (hl - i)
             neighbour_y = y - (hl - j)
-            if neighbour_x >= len(source):
-                neighbour_x -= len(source)
-            if neighbour_y >= len(source[0]):
-                neighbour_y -= len(source[0])
+            if neighbour_x >= source.shape[0]:
+                neighbour_x -= source.shape[0]
+            if neighbour_y >= source.shape[1]:
+                neighbour_y -= source.shape[1]
             gi = gaussian(source[neighbour_x][neighbour_y] - source[x][y], sigma_i)
             gs = gaussian(distance(neighbour_x, neighbour_y, x, y), sigma_s)
             w = gi * gs
@@ -131,18 +131,23 @@ def apply_bilateral_filter(source, filtered_image, x, y, diameter, sigma_i, sigm
     filtered_image[x][y] = int(round(i_filtered))
 
 
-def bilateral_filter(image, filter_diameter, sigma_i, sigma_s):
-    source = np.array(image)
-    filtered_image = np.zeros(source.shape)
+def bilateral_filter(source, filter_diameter, sigma_i, sigma_s):
+    result = np.zeros((source.shape[0], source.shape[1], source.shape[2], 3))
 
-    i = 0
-    while i < len(source):
-        j = 0
-        while j < len(source[0]):
-            apply_bilateral_filter(source, filtered_image, i, j, filter_diameter, sigma_i, sigma_s)
-            j += 1
-        i += 1
-    return filtered_image
+    for c in range(3):
+        color_image = source[0, :, :, c]
+
+        filtered_image = np.zeros(color_image.shape)
+
+        i = 0
+        while i < color_image.shape[0]:
+            j = 0
+            while j < color_image.shape[1]:
+                apply_bilateral_filter(color_image, filtered_image, i, j, filter_diameter, sigma_i, sigma_s)
+                j += 1
+            i += 1
+        result[:, :, :, c] = filtered_image
+    return result
 
 
 
