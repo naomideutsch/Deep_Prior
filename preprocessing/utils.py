@@ -72,11 +72,7 @@ def get_blur(kernel_size, sigma, type="gauss"):
     if type == "disk":
         kernel = _disk_kernel(kernel_size)
         return lambda image: apply_blur(image, kernel)
-    if type == "median":
-        return lambda image: cv2.medianBlur(image, kernel_size)
 
-    # if type == "bi":
-    #     return lambda image: bilateral_filter(image,kernel_size,sigma,sigma) # sigma = 75
 
 
 
@@ -96,6 +92,29 @@ def convert_to_gray(image):
 
 
     return final
+
+
+
+
+def distance(x, y, i, j):
+    ci = tf.constant(i)
+    cj = tf.constant(j)
+    c2 = tf.constant(2)
+    sub_i = tf.math.subtract(x-ci)
+    sub_j = tf.math.subtract(y-cj)
+    pow_i = tf.math.pow(sub_i, c2)
+    pow_j = tf.math.pow(sub_j, c2)
+    return tf.math.sqrt(tf.math.add(pow_i, pow_j))
+
+
+
+def gaussian(x, sigma):
+    c1 = tf.constant(2)
+    c2 = tf.constant(2 * sigma ** 2)
+    x_pow = tf.math.scalar_mul(-1, tf.math.pow(x, c1))
+    x_exp = tf.math.exp(tf.math.divid(x_pow, c2))
+    result = tf.math.scalar_mul((1.0 / (2 * math.pi * (sigma ** 2))), x_exp)
+    return result
 
 
 
