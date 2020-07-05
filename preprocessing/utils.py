@@ -4,6 +4,9 @@ import argparse
 import numpy as np
 from skimage.draw import circle
 import cv2
+import pickle
+import os
+
 
 
 def _gaussian_kernel(kernel_size, sigma, n_channels, dtype):
@@ -73,6 +76,8 @@ def get_blur(kernel_size, sigma, type="gauss"):
 
     if type == "bi":
         return lambda image: cv2.bilateralFilter(cv2.UMat(image),kernel_size,sigma,sigma) # sigma = 75
+    if type == "psf":
+        return lambda image: PsfBlur_random(image) # sigma = 75
 
 
 def apply_blur(img, kernel):
@@ -91,6 +96,31 @@ def convert_to_gray(image):
 
 
     return final
+
+
+
+
+
+def PsfBlur(image, psfid):
+    kernel = psfDictionary[psfid]
+    convolved = apply_blur(image, kernel)
+    # convolved = convolve2d(imgarray, kernel, mode='same', fillvalue=255.0).astype("uint8")
+    img = Image.fromarray(convolved)
+    return img
+
+
+def PsfBlur_random(img):
+    pickledPsfFilename = os.path.join(os.path.dirname(__file__), "psf.pkl")
+
+    with open(pickledPsfFilename, 'rb') as pklfile:
+        psfDictionary = pickle.load(pklfile)
+    psfid = np.random.randint(0, len(psfDictionary))
+    kernel = psfDictionary[psfid]
+    convolved = apply_blur(img, kernel)
+
+
+    return convolved
+
 
 
 
