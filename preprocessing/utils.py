@@ -6,6 +6,7 @@ from skimage.draw import circle
 import cv2
 import pickle
 import os
+import math
 
 
 
@@ -75,9 +76,8 @@ def get_blur(kernel_size, sigma, type="gauss"):
         return lambda image: cv2.medianBlur(image, kernel_size)
 
     if type == "bi":
-        return lambda image: cv2.bilateralFilter(cv2.UMat(image),kernel_size,sigma,sigma) # sigma = 75
-    if type == "psf":
-        return lambda image: PsfBlur_random(image) # sigma = 75
+        return lambda image: bilateral_filter(image,kernel_size,sigma,sigma) # sigma = 75
+
 
 
 def apply_blur(img, kernel):
@@ -98,29 +98,50 @@ def convert_to_gray(image):
     return final
 
 
+def distance(x, y, i, j):
+    return np.sqrt((x-i)**2 + (y-j)**2)
 
 
-
-def PsfBlur(image, psfid):
-    kernel = psfDictionary[psfid]
-    convolved = apply_blur(image, kernel)
-    # convolved = convolve2d(imgarray, kernel, mode='same', fillvalue=255.0).astype("uint8")
-    img = Image.fromarray(convolved)
-    return img
+def gaussian(x, sigma):
+    return (1.0 / (2 * math.pi * (sigma ** 2))) * math.exp(- (x ** 2) / (2 * sigma ** 2))
 
 
-def PsfBlur_random(img):
-    pickledPsfFilename = os.path.join(os.path.dirname(__file__), "psf.pkl")
+def apply_bilateral_filter(source, filtered_image, x, y, diameter, sigma_i, sigma_s):
+    hl = diameter/2
+    i_filtered = 0
+    Wp = 0
+    i = 0
+    while i < diameter:
+        j = 0
+        while j < diameter:
+            neighbour_x = x - (hl - i)
+            neighbour_y = y - (hl - j)
+            if neighbour_x >= len(source):
+                neighbour_x -= len(source)
+            if neighbour_y >= len(source[0]):
+                neighbour_y -= len(source[0])
+            gi = gaussian(source[neighbour_x][neighbour_y] - source[x][y], sigma_i)
+            gs = gaussian(distance(neighbour_x, neighbour_y, x, y), sigma_s)
+            w = gi * gs
+            i_filtered += source[neighbour_x][neighbour_y] * w
+            Wp += w
+            j += 1
+        i += 1
+    i_filtered = i_filtered / Wp
+    filtered_image[x][y] = int(round(i_filtered))
 
-    with open(pickledPsfFilename, 'rb') as pklfile:
-        psfDictionary = pickle.load(pklfile)
-    psfid = np.random.randint(0, len(psfDictionary))
-    kernel = psfDictionary[psfid]
-    convolved = apply_blur(img, kernel)
 
+def bilateral_filter(source, filter_diameter, sigma_i, sigma_s):
+    filtered_image = np.zeros(source.shape)
 
-    return convolved
-
+    i = 0
+    while i < len(source):
+        j = 0
+        while j < len(source[0]):
+            apply_bilateral_filter(source, filtered_image, i, j, filter_diameter, sigma_i, sigma_s)
+            j += 1
+        i += 1
+    return filtered_image
 
 
 
