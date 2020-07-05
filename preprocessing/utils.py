@@ -72,7 +72,7 @@ def get_blur(kernel_size, sigma, type="gauss"):
         return lambda image: cv2.medianBlur(image, kernel_size)
 
     if type == "bi":
-        return lambda image: cv2.bilateralFilter(image,kernel_size,sigma,sigma) # sigma = 75
+        return lambda image: cv2.bilateralFilter(cv2.UMat(image),kernel_size,sigma,sigma) # sigma = 75
 
 
 def apply_blur(img, kernel):
@@ -87,7 +87,10 @@ def convert_to_gray(image):
     gray = gray[:,:,:, None]
     result = tf.concat([gray, gray], -1)
     result = tf.concat([result, gray], -1)
-    return result
+    final = result.eval(session=tf.compat.v1.Session())
+
+
+    return final
 
 
 
