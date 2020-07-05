@@ -7,6 +7,7 @@ import cv2
 import pickle
 import os
 import math
+import tensorflow_addons as tfa
 
 
 
@@ -73,10 +74,10 @@ def get_blur(kernel_size, sigma, type="gauss"):
         kernel = _disk_kernel(kernel_size)
         return lambda image: apply_blur(image, kernel)
     if type == "median":
-        return lambda image: cv2.medianBlur(image, kernel_size)
+        return lambda image: tfa.image.median_filter2d(image, kernel_size, kernel_size, "SYMMETRIC")
 
-    if type == "bi":
-        return lambda image: bilateral_filter(image,kernel_size,sigma,sigma) # sigma = 75
+    # if type == "bi":
+    #     return lambda image: bilateral_filter(image,kernel_size,sigma,sigma) # sigma = 75
 
 
 
@@ -103,56 +104,9 @@ def distance(x, y, i, j):
 
 
 def gaussian(x, sigma):
-    return (1.0 / (2 * math.pi * (sigma ** 2))) * math.exp(- (x ** 2) / (2 * sigma ** 2))
-
-
-def apply_bilateral_filter(source, filtered_image, x, y, diameter, sigma_i, sigma_s):
-    hl = diameter/2
-    i_filtered = 0
-    Wp = 0
-    i = 0
-    while i < diameter:
-        j = 0
-        while j < diameter:
-            neighbour_x = x - (hl - i)
-            neighbour_y = y - (hl - j)
-            if neighbour_x >= source.shape[0]:
-                neighbour_x -= source.shape[0]
-            if neighbour_y >= source.shape[1]:
-                neighbour_y -= source.shape[1]
-            gi = gaussian(source[neighbour_x][neighbour_y] - source[x][y], sigma_i)
-            gs = gaussian(distance(neighbour_x, neighbour_y, x, y), sigma_s)
-            w = gi * gs
-            i_filtered += source[neighbour_x][neighbour_y] * w
-            Wp += w
-            j += 1
-        i += 1
-    i_filtered = i_filtered / Wp
-    filtered_image[x][y] = int(round(i_filtered))
-
-
-def bilateral_filter(source, filter_diameter, sigma_i, sigma_s):
-    result = np.zeros((source.shape[0], source.shape[1], source.shape[2], 3))
-
-    for c in range(3):
-        color_image = source[0, :, :, c]
-
-        filtered_image = np.zeros(color_image.shape)
-
-        i = 0
-        while i < color_image.shape[0]:
-            j = 0
-            while j < color_image.shape[1]:
-                apply_bilateral_filter(color_image, filtered_image, i, j, filter_diameter, sigma_i, sigma_s)
-                j += 1
-            i += 1
-        result[:, :, :, c] = filtered_image
-    return result
-
-
-
-
-
-
-
+    div = tf.constant(2 * sigma ** 2)
+    x_pow = tf.math.pow(x, tf.constant(2))
+    x_exp = tf.math.exp(tf.math.divide(-x_pow, div))
+    mul_factor = tf.constant(1.0 / (2 * math.pi * (sigma ** 2)))
+    return tf.math.multiply(mul_factor * x_exp)
 
