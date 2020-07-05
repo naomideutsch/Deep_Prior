@@ -131,7 +131,8 @@ def apply_bilateral_filter(source, filtered_image, x, y, diameter, sigma_i, sigm
     filtered_image[x][y] = int(round(i_filtered))
 
 
-def bilateral_filter(source, filter_diameter, sigma_i, sigma_s):
+def bilateral_filter(image, filter_diameter, sigma_i, sigma_s):
+    source = np.array(image)
     filtered_image = np.zeros(source.shape)
 
     i = 0
