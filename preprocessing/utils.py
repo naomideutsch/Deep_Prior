@@ -7,7 +7,6 @@ import cv2
 import pickle
 import os
 import math
-import tensorflow_addons as tfa
 
 
 
@@ -74,7 +73,7 @@ def get_blur(kernel_size, sigma, type="gauss"):
         kernel = _disk_kernel(kernel_size)
         return lambda image: apply_blur(image, kernel)
     if type == "median":
-        return lambda image: tfa.image.median_filter2d(image, kernel_size, kernel_size, "SYMMETRIC")
+        return lambda image: cv2.medianBlur(image, kernel_size)
 
     # if type == "bi":
     #     return lambda image: bilateral_filter(image,kernel_size,sigma,sigma) # sigma = 75
@@ -99,14 +98,8 @@ def convert_to_gray(image):
     return final
 
 
-def distance(x, y, i, j):
-    return np.sqrt((x-i)**2 + (y-j)**2)
 
 
-def gaussian(x, sigma):
-    div = tf.constant(2 * sigma ** 2)
-    x_pow = tf.math.pow(x, tf.constant(2))
-    x_exp = tf.math.exp(tf.math.divide(-x_pow, div))
-    mul_factor = tf.constant(1.0 / (2 * math.pi * (sigma ** 2)))
-    return tf.math.multiply(mul_factor * x_exp)
+
+
 
